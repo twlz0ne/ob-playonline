@@ -36,7 +36,7 @@
 
 (require 'org)
 (require 'dash)
-(require 'play-code)
+(require 'playonline)
 
 ;;;###autoload
 (defalias 'org-babel-execute-src-block:playonline 'ob-playonline-org-babel-execute-src-block)
@@ -117,12 +117,15 @@ block."
                      cmd
                      lang-id
                      wrapper
-                     (play-code-output-to-buffer-p nil)
+                     (playonline-output-to-buffer-p nil)
                      result)
                 (-setq (lang-id cmd wrapper)
-                  (play-code--get-lang-and-function
-                   (play-code--get-mode-alias
-                    (org-src--get-lang-mode lang))))
+                  (playonline--get-lang-and-function
+                   (playonline--get-mode-alias
+                    (funcall
+                     (or (-first 'fboundp '(org-src-get-lang-mode org-src-get--lang-mode))
+                         (error "Can't get lang mode"))
+                     lang))))
                 (when wrapper
                   (setq body (funcall wrapper body)))
                 (unless (fboundp cmd)
